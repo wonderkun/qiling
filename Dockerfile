@@ -1,29 +1,31 @@
-FROM python:3.6-slim AS builder
+FROM python:3.6-alpine
 
-LABEL maintainer="Kevin Foo <chfl4gs@qiling.io>"
 
-ENV DEBIAN_FRONTEND=noninteractive
+ENV PIP_NO_CACHE_DIR=1
 
-RUN apt-get update \
-  && apt-get -y upgrade \
-  && apt-get install -y --no-install-recommends cmake build-essential gcc git
+RUN apk add --no-cache \
+    gcc \
+    make \
+    cmake \
+    libtool \
+    automake \
+    autoconf \
+    g++ \
+    linux-headers \
+    git \
+    libstdc++ \
+    bash \
+    vim \
+    file
 
-RUN git clone -b dev https://github.com/qilingframework/qiling.git \
-  && cd qiling \
-  && pip wheel . -w wheels
+# RUN  pip3 install capstone>=4.0.1  unicorn>=1.0.2rc4 pefile>=2019.4.18 python-registry>=1.3.1 keystone-engine>=0.9.2
 
-FROM python:3.6-slim AS base
+RUN mkdir /qiling
 
-COPY --from=builder /qiling /qiling
+COPY ./requirements.txt /qiling/requirements.txt
+
+RUN pip3 install -r /qiling/requirements.txt
 
 WORKDIR /qiling
 
-RUN apt-get update \
-  && apt-get install -y libmagic-dev \ 
-  && rm -rf /var/lib/apt/lists/* \
-  && pip3 install wheels/*.whl \
-  && rm -rf wheels
-
-ENV HOME /qiling
-
-CMD bash
+CMD ["tail","-f","/dev/null"]

@@ -1,0 +1,10 @@
+version: "3"
+services: 
+    qiling-framework:
+        build: ./
+        volumes: 
+            - ./examples:/qiling/examples
+            - ./tests:/qiling/tests
+            - ./qltool:/qiling/qltool
+            - ./qiling:/qiling/qiling
+
